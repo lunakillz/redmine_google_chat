@@ -2,114 +2,36 @@ require 'httpclient'
   
 module RedmineGoogleChat
 	class HookListener < Redmine::Hook::Listener
-		def issues_new_after_save(context={})
+		def controller_issues_new_after_save(context = {})
 			issue = context[:issue]
 			controller = context[:controller]
-			return if issue.is_private?
 			post(issue_to_json(issue, controller))
 		end
 	
-		def issues_edit_after_save(context={})
+		def controller_issues_edit_after_save(context = {})
 			issue = context[:issue]
 			controller = context[:controller]
-			return if issue.is_private?
 			post(issue_to_json(issue, controller))
 		end
 	
+
+		def controller_issues_bulk_edit_after_save(context = {})
+			controller = context[:controller]
+			issue = context[:issue]
+			
+			#post(webhooks, journal_to_json(issue, journal, controller))
+		end
+		
+		
 		def model_changeset_scan_commit_for_issue_ids_pre_issue_update(context={})
-			# issue = context[:issue]
-			# journal = issue.current_journal
-			# changeset = context[:changeset]
-	
-			# thread = thread_for_project issue.project
-			# url = url_for_project issue.project
-	
-			# return unless thread and url and issue.save
-			# return if issue.is_private?
-	
-			# msg = {
-			# 	:project_name => issue.project,
-			# 	:author => journal.user.to_s,
-			# 	:action => "updated",
-			# 	:link => object_url(issue),
-			# 	:issue => issue
-			# }
-	
-			# repository = changeset.repository
-	
-			# if Setting.host_name.to_s =~ /\A(https?\:\/\/)?(.+?)(\:(\d+))?(\/.+)?\z/i
-			# 	host, port, prefix = $2, $4, $5
-			# 	revision_url = Rails.application.routes.url_for(
-			# 		:controller => 'repositories',
-			# 		:action => 'revision',
-			# 		:id => repository.project,
-			# 		:repository_id => repository.identifier_param,
-			# 		:rev => changeset.revision,
-			# 		:host => host,
-			# 		:protocol => Setting.protocol,
-			# 		:port => port,
-			# 		:script_name => prefix
-			# 	)
-			# else
-			# 	revision_url = Rails.application.routes.url_for(
-			# 		:controller => 'repositories',
-			# 		:action => 'revision',
-			# 		:id => repository.project,
-			# 		:repository_id => repository.identifier_param,
-			# 		:rev => changeset.revision,
-			# 		:host => Setting.host_name,
-			# 		:protocol => Setting.protocol
-			# 	)
-			# end
-	
-			# card = {
-			# 	:header => {
-			# 		:title => ll(Setting.default_language, :text_status_changed_by_changeset, "<a href=\"#{revision_url}\">#{escape changeset.comments}</a>")
-			# 	},
-			# 	:sections => []
-			# }
-	
-			# card[:sections] << {
-			# 	:widgets => journal.details.map { |d| detail_to_field d }
-			# }
-	
-			# speak msg, thread, card, url
 		end
 	
-		def controller_wiki_edit_after_save(context = { })
-			# return unless Setting.plugin_redmine_hangouts_chat['post_wiki_updates'] == '1'
-	
-			# project = context[:project]
-			# page = context[:page]
-	
-			# user = page.content.author
-	
-			# thread = thread_for_project project
-			# url = url_for_project project
-	
-			# card = nil
-			# if not page.content.comments.empty?
-			# 	card = {
-			# 		:header => {
-			# 			:title => "#{escape page.content.comments}"
-			# 		}
-			# 	}
-			# end
-	
-			# comment = {
-			# 	:project_name => project,
-			# 	:author => user,
-			# 	:action => "updated",
-			# 	:link => object_url(page),
-			# 	:project_link => object_url(project)
-			# }
-	
-			# speak comment, thread, card, url
+		def controller_wiki_edit_after_save(context = {})
 		end
 	
 		
 	
-	private
+		private
 		def issue_to_json(issue, controller)
 			msg = {
 				:project_name => issue.project,
@@ -260,7 +182,8 @@ module RedmineGoogleChat
 		def post(body)
 
 			url = Setting.plugin_redmine_google_chat['webhook_url'] if not url
-	
+			Rails.logger.info("url is #{url}")
+			Rails.logger.info("body is #{body}")
 			begin
 				client = HTTPClient.new
 				client.ssl_config.cert_store.set_default_paths
