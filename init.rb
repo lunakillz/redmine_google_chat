@@ -15,4 +15,3 @@ Redmine::Plugin.register :redmine_google_chat do
 		},
 		:partial => 'settings/google_chat_settings'
 end
-l
