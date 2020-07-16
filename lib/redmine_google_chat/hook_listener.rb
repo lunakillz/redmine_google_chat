@@ -116,7 +116,7 @@ module RedmineGoogleChat
 				:author => issue.author.to_s,
 				:action => "created",
 				:issue => issue,
-				:link => controller.issue_url(issue)
+				:link => controller.issue_url(issue),
 				:mentions => "#{mentions issue.description}"
 			}
 			card = {}
