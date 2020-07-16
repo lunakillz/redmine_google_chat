@@ -261,43 +261,11 @@ module RedmineGoogleChat
 
 			url = Setting.plugin_redmine_google_chat['webhook_url'] if not url
 	
-			card[:header] = {
-				:title => "#{msg[:author]} #{msg[:action]} #{escape msg[:issue]} #{msg[:mentions]}",
-				:subtitle => "#{escape msg[:project_name]}"
-			}
-
-			params = {
-				:cards => [ card ]
-			}
-	
-			card[:sections] << {
-				:widgets => [
-					:buttons => [
-						{
-							:textButton => {
-								:text => "OPEN ISSUE",
-								:onClick => {
-									:openLink => {
-										:url => msg[:link]
-									}
-								}
-							}
-						}
-					]
-				]
-			} if msg[:link]
-	
-			params[:sender] = { :displayName => username } if username
-			
-			text = {
-				:text => [ params ]	
-			}
-	
 			begin
 				client = HTTPClient.new
 				client.ssl_config.cert_store.set_default_paths
 				client.ssl_config.ssl_version = :auto
-				client.post_async url, {:body => text.to_json, :header => {'Content-Type' => 'application/json'}}
+				client.post_async url, {:body => body, :header => {'Content-Type' => 'application/json'}}
 			rescue Exception => e
 				Rails.logger.warn("cannot connect to #{url}")
 				Rails.logger.warn(e)
