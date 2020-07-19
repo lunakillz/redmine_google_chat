@@ -1,4 +1,6 @@
-require 'httpclient'
+require 'net/http'
+require 'net/https'
+require 'uri'
   
 module RedmineGoogleChat
 	class HookListener < Redmine::Hook::Listener
@@ -185,11 +187,18 @@ module RedmineGoogleChat
 			Rails.logger.info("url is #{url}")
 			Rails.logger.info("body is #{body}")
 			begin
-				client = HTTPClient.new
-				client.ssl_config.cert_store.set_default_paths
-				client.ssl_config.ssl_version = :auto
-				client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-				client.post_async url, {:body => body, :header => {'Content-Type' => 'application/json'}}
+				uri = URI.parse(url)
+				https = Net::HTTP.new(uri.host,uri.port)
+				https.use_ssl = true
+				http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+				req = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
+				req.body = body
+				res = https.request(req)
+				#client = HTTPClient.new
+				#client.ssl_config.cert_store.set_default_paths
+				#client.ssl_config.ssl_version = :auto
+				#client.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+				#client.post_async url, {:body => body, :header => {'Content-Type' => 'application/json'}}
 			rescue Exception => e
 				Rails.logger.warn("cannot connect to #{url}")
 				Rails.logger.warn(e)
