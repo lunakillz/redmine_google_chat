@@ -69,15 +69,31 @@ module RedmineGoogleChat
 					:contentMultiline => "false"
 				}
 			} if issue.assigned_to
+
+			linkSection = [
+				:buttons => [
+					:textButton => {
+						:text => "OPEN ISSUE",
+						:onClick => {
+							:openLink => {
+								:url => controller.issue_url(issue)
+							}
+						}
+					}
+				]
+			]
 	
 			card[:sections] = [
 				{
 					:widgets => widgets
+				},
+				{
+					:widgets => linkSection
 				}
 			]
 	
 			{
-				:card => card
+				:cards => card
 			}.to_json
 		end
 
@@ -176,8 +192,6 @@ module RedmineGoogleChat
 				text = ''
 			end
 	
-			# slack usernames may only contain lowercase letters, numbers,
-			# dashes and underscores and must start with a letter or number.
 			text.scan(/@[a-z0-9][a-z0-9_\-]*/).uniq
 		end
 
@@ -185,12 +199,12 @@ module RedmineGoogleChat
 			url = Setting.plugin_redmine_google_chat['webhook_url'] if not url
 			begin
 				uri = URI.parse(url)
-                                https = Net::HTTP.new(uri.host,uri.port)
-                                Rails.logger.info("uri.qeury #{uri.query}")
-                                https.use_ssl = true
-                                req = Net::HTTP::Post.new(uri,initheader = {'Content-Type' =>'application/json'})
-                                req.body = body
-                                res = https.request(req)
+				https = Net::HTTP.new(uri.host,uri.port)
+				Rails.logger.info("uri.qeury #{uri.query}")
+				https.use_ssl = true
+				req = Net::HTTP::Post.new(uri,initheader = {'Content-Type' =>'application/json'})
+				req.body = body
+				res = https.request(req)
 			rescue Exception => e
 				Rails.logger.warn("cannot connect to #{url}")
 				Rails.logger.warn(e)
