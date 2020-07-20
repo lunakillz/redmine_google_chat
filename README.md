@@ -1,1 +1,1 @@
-# Google Chat plugin for Redminegi
+# Google Chat plugin for Redmine
