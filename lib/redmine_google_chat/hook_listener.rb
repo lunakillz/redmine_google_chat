@@ -37,10 +37,12 @@ module RedmineGoogleChat
 		def issue_to_json(issue, controller)
 			text = "#{issue.author.to_s} created #{escape issue}"
 			card = {}
+
 			card[:header] = {
-				:title => "#{escape issue.project,}",
+				:title => "#{escape issue.project}",
 				:subtitle => "#{mentions issue.description}"
 			}
+
 			widgets = [{
 				:keyValue => {
 					:topLabel => I18n.t("field_status"),
@@ -59,7 +61,7 @@ module RedmineGoogleChat
 				:keyValue => {
 					:topLabel => I18n.t("field_assigned_to"),
 					:content => escape(issue.assigned_to.to_s),
-					:contentMultiline => "false"
+					:contentMultiline => "false",
 					:icon => "PERSON"
 				}
 			} if issue.assigned_to
@@ -113,7 +115,6 @@ module RedmineGoogleChat
 			end
 		end
 	
-		
 	
 		def mentions text
 			return nil if text.nil?
