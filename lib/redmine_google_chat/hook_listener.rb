@@ -40,7 +40,7 @@ module RedmineGoogleChat
 			card = {}
 
 			card[:header] = {
-				:title => "`#{escape issue.project}`",
+				:title => "#{escape issue.project}",
 				:subtitle => "#{mentions issue.description}"
 			}
 
@@ -130,14 +130,12 @@ module RedmineGoogleChat
 				]
 			]
 	
-			card[:sections] = [
-				{
-					:widgets => widgets
-				},
-				{
-					:widgets => linkSection
-				}
-			]
+			card[:sections] << {
+				:widgets => linkSection
+			}
+
+
+
 			{
 				:text => text,
 				:cards => card
